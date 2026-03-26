@@ -1618,13 +1618,11 @@ class DGTLossModule(nn.Module):
 
         # 5. State control
         self.warmup_epochs = warmup_epochs
-        # Respect user-provided schedule and only enforce ordering.
         self.start_dynamic_epoch = max(0, int(start_dynamic_epoch))
         self.stop_dynamic_epoch = max(self.start_dynamic_epoch + 1, int(stop_dynamic_epoch))
         self.task_to_idx = {'det': 0, 'seg': 1, 'bbox': 0, 'mask': 1}
         self.diff_threshold = diff_threshold
         self.momentum = momentum
-        # Use paired balancing with near-1 bounds; keep total core budget stable.
         self.clamp_min = min(1.0, max(0.8, float(clamp_min)))
         self.clamp_max = max(1.0, float(clamp_max))
         self.geom_weight = geom_weight
@@ -1644,7 +1642,7 @@ class DGTLossModule(nn.Module):
         self.ema_alpha = ema_alpha
         self.adjust_step = adjust_step
         self.hold_when_stable = hold_when_stable
-        # Reset multipliers at stop if requested.
+
         self.reset_on_stop = reset_on_stop
         self.stagnant_threshold = stagnant_threshold
         self.improve_threshold = improve_threshold
@@ -1659,8 +1657,7 @@ class DGTLossModule(nn.Module):
         self.aux_momentum = max(0.0, min(0.999, float(aux_momentum)))
         self.main_max_step = max(0.0, float(main_max_step))
         self.aux_max_step = max(0.0, float(aux_max_step))
-        # Resource-anchor residual scaling:
-        # keep DGTL/GS as small deltas on top of resource baseline when < 1.
+
         self.core_residual_scale = max(0.0, min(1.0, float(core_residual_scale)))
         self.aux_residual_scale = max(0.0, min(1.0, float(aux_residual_scale)))
         self.gs_residual_scale = max(0.0, min(1.0, float(gs_residual_scale)))
@@ -1670,8 +1667,6 @@ class DGTLossModule(nn.Module):
         self.gs_residual_floor = max(0.0, min(1.0, float(gs_residual_floor)))
         self.geom_residual_floor = max(0.0, min(1.0, float(geom_residual_floor)))
         self.floor_quality_thr = max(0.0, min(1.0, float(floor_quality_thr)))
-        # Late-stage CE/Sem rescue schedule (minimal and conservative):
-        # only active for DGTL-enabled runs and ramps smoothly.
         self.ce_late_start_epoch = int(ce_late_start_epoch)
         self.ce_late_warmup_epochs = max(1, int(ce_late_warmup_epochs))
         self.ce_boost_max = max(1.0, float(ce_boost_max))
@@ -1691,9 +1686,7 @@ class DGTLossModule(nn.Module):
         self.register_buffer('imbalance_confirm_counter', torch.zeros(1))
         self.register_buffer('last_imbalance_sign', torch.zeros(1))
         self.register_buffer('freeze_updates_flag', torch.zeros(1))
-        # Geom debug accumulators (per-epoch)
-        # idx: 0=considered, 1=called, 2=skip_missing_inputs, 3=skip_all_pseudo,
-        #      4=skip_disabled_or_zero, 5=skip_zeta, 6=skip_empty, 7=computed, 8=pseudo_guided
+
         self.register_buffer('geom_debug_acc', torch.zeros(9))
 
     def _geom_debug_add(self, idx, value=1.0):
@@ -1758,7 +1751,6 @@ class DGTLossModule(nn.Module):
         if float(self.has_reset.item()) > 0.5 and epoch < self.stop_dynamic_epoch:
             self.has_reset.zero_()
         if epoch >= self.stop_dynamic_epoch:
-            # Stop all DGTL effects in late stage to avoid objective drift/oscillation.
             if self.reset_on_stop and float(self.has_reset.item()) < 0.5:
                 self.global_multipliers.fill_(1.0)
                 self.task_v.zero_()
@@ -1827,7 +1819,6 @@ class DGTLossModule(nn.Module):
             return
 
         # Re-anchor dynamic reference at activation epoch.
-        # Using very-early training losses as ref makes ratios always <= 1 and disables re-balancing.
         if float(self.dynamic_ref_ready.item()) < 0.5:
             self.ref_losses = torch.clamp(self.ema_losses.detach(), min=1e-3)
             self.prev_epoch_losses = self.ema_losses
@@ -1874,7 +1865,6 @@ class DGTLossModule(nn.Module):
             aux_new = max(self.aux_clamp_min, min(self.aux_clamp_max, aux_new))
             self.aux_multiplier.fill_(aux_new)
 
-        # Keep DGTL active with slow updates instead of frequently freezing at 1.0.
         epoch_gap = float(epoch) - float(self.last_update_epoch.item())
         if epoch_gap < float(self.min_epoch_gap):
             _update_aux_multiplier(ratio_now)
@@ -1925,7 +1915,6 @@ class DGTLossModule(nn.Module):
                 )
             return
 
-        # Core dynamic weights: re-balance det/seg relatively (paired), not globally scale both.
         imbalance = torch.clamp(log_ratios[0] - log_ratios[1], min=-3.0, max=3.0)
         delta_up = max(0.0, float(self.clamp_max - 1.0))
         delta_dn = max(0.0, float(1.0 - self.clamp_min))
@@ -2348,7 +2337,6 @@ class DGTLossModule(nn.Module):
         dice_cons_loss = 1.0 - dice_pm
         agreement = inter_pm / (mask_probs.sum(dim=-1) + m_box.sum(dim=-1) - inter_pm + 1e-6)
 
-        # GT closeness (quality factor for stability and GS signal)
         gt_masks = gt_masks.float()
         inter_gt = (mask_probs * gt_masks).sum(dim=-1)
         union_gt = mask_probs.sum(dim=-1) + gt_masks.sum(dim=-1) - inter_gt
@@ -2363,10 +2351,7 @@ class DGTLossModule(nn.Module):
         box_iou = inter_vol_gt / (pred_vol + gt_vol - inter_vol_gt + 1e-6)
 
         quality = 0.5 * (box_iou + mask_iou)
-        # GT-guided focus:
-        # - near GT + inconsistent det/seg -> strong correction
-        # - near GT + consistent -> mild maintenance
-        # - far from GT -> suppress to avoid noisy gradients
+
         quality_floor = max(0.0, min(1.0, float(self.geom_gate_floor)))
         quality_weight = torch.clamp(quality.detach(), min=quality_floor, max=1.0)
         box_gate = torch.sigmoid(10.0 * (box_iou.detach() - float(self.geom_box_thr)))
@@ -2376,7 +2361,6 @@ class DGTLossModule(nn.Module):
         inconsistent_focus = near_gt_gate * (1.0 - agree_gate)
         consistent_focus = near_gt_gate * agree_gate
         bg_floor = max(0.0, min(0.2, float(self.geom_neg_weight)))
-        # Corrective mode: prioritize near-GT inconsistent samples, keep mild weight on already-consistent ones.
         reliability = bg_floor + (1.0 - bg_floor) * (inconsistent_focus + 0.25 * consistent_focus)
         geom_core = (iou_cons_loss + dice_cons_loss) * quality_weight * reliability
 
@@ -2557,7 +2541,7 @@ def compute_hungarian_loss(end_points, num_decoder_layers, set_criterion,
             elif 'proposal_center' in end_points and 'proposal_pred_size' in end_points:
                 geom_boxes = torch.cat([end_points['proposal_center'], end_points['proposal_pred_size']], dim=-1)
 
-            # Prefer per-query segmentation branch for geom/quality signals.
+
             geom_masks = end_points.get('sp_last_pred_masks', None)
             if geom_masks is None:
                 geom_masks = end_points.get('last_pred_masks', None)
@@ -2697,7 +2681,6 @@ def compute_hungarian_loss(end_points, num_decoder_layers, set_criterion,
 
     # =========================================================================
     # [FINAL LOSS CALCULATION]
-    # Key fix: apply m_mask to all mask-related losses
     # =========================================================================
 
     weight = 1
@@ -2755,8 +2738,6 @@ def compute_hungarian_loss(end_points, num_decoder_layers, set_criterion,
 
     # -------------------------------------------------------------------------
     # Gradient Consistency Support (for Gradient Surgery)
-    # GS must observe the resource-anchored task conflict, not the DGTL-reweighted
-    # conflict, otherwise DGTL and GS form a positive feedback loop.
     # -------------------------------------------------------------------------
     loss_det_tensor = core_det_base
     loss_seg_tensor = core_seg_base
