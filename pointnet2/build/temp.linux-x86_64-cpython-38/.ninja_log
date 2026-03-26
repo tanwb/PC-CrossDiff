@@ -1,0 +1,10 @@
+# ninja log v7
+1422	23577	1773043145697699000	/dsjxytest/models/model/vg3d/PC-CrossDiff/pointnet2/build/temp.linux-x86_64-cpython-38/_ext_src/src/group_points_gpu.o	4a14ee3766a1a888
+1420	23583	1773043145696039000	/dsjxytest/models/model/vg3d/PC-CrossDiff/pointnet2/build/temp.linux-x86_64-cpython-38/_ext_src/src/ball_query_gpu.o	79bc08a13d2fb43a
+1423	23612	1773043145698684000	/dsjxytest/models/model/vg3d/PC-CrossDiff/pointnet2/build/temp.linux-x86_64-cpython-38/_ext_src/src/interpolate_gpu.o	9e9be902a1a5204c
+1424	23693	1773043145699647000	/dsjxytest/models/model/vg3d/PC-CrossDiff/pointnet2/build/temp.linux-x86_64-cpython-38/_ext_src/src/sampling_gpu.o	aedc632245da769
+1378	18496	1773043198144237000	/dsjxytest/models/model/vg3d/PC-CrossDiff/pointnet2/build/temp.linux-x86_64-cpython-38/_ext_src/src/ball_query.o	ef4291a45b735b5
+1380	18565	1773043198146073000	/dsjxytest/models/model/vg3d/PC-CrossDiff/pointnet2/build/temp.linux-x86_64-cpython-38/_ext_src/src/group_points.o	ba17e16727bd7e8e
+1379	18662	1773043198145378000	/dsjxytest/models/model/vg3d/PC-CrossDiff/pointnet2/build/temp.linux-x86_64-cpython-38/_ext_src/src/bindings.o	f3603c091c1df821
+1381	18705	1773043198147280000	/dsjxytest/models/model/vg3d/PC-CrossDiff/pointnet2/build/temp.linux-x86_64-cpython-38/_ext_src/src/sampling.o	2d3df789bbfb9b74
+1381	19299	1773043198146755000	/dsjxytest/models/model/vg3d/PC-CrossDiff/pointnet2/build/temp.linux-x86_64-cpython-38/_ext_src/src/interpolate.o	268cf58ef8aa66c7
