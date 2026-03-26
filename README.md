@@ -5,10 +5,15 @@
 - **2026-03-26**: Official code release of **PC_CrossDiff**.
 - **AAAI 2026**: Our paper **"PC-CrossDiff: Point-Cluster Dual-Level Cross-Modal Differential Attention for Unified 3D Referring and Segmentation"** is accepted by **Proceedings of the AAAI Conference on Artificial Intelligence**.
 
-:tada::tada::tada:
-This repository provides the PyTorch implementation of **PC_CrossDiff**, proposed in the paper ["PC-CrossDiff: Point-Cluster Dual-Level Cross-Modal Differential Attention for Unified 3D Referring and Segmentation"] (AAAI 2026).
-If you are interested in our work and have any questions, please feel free to contact us at `wbtan@stu.xmu.edu.cn`. Discussions are welcome.
-**Paper Framework**
+## Overview
+
+:tada: This repository provides the PyTorch implementation of **PC_CrossDiff**, proposed in the AAAI 2026 paper ["PC-CrossDiff: Point-Cluster Dual-Level Cross-Modal Differential Attention for Unified 3D Referring and Segmentation"].
+
+## Contact
+
+If you are interested in our work or have any questions, please feel free to contact us at `wbtan@stu.xmu.edu.cn`. We welcome discussions and collaborations.
+
+## Paper Framework
 
 ![Paper Framework](./img/fig_overall_network.png)
 
