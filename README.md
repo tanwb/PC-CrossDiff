@@ -10,7 +10,7 @@ This repository provides the PyTorch implementation of **PC_CrossDiff**, propose
 If you are interested in our work and have any questions, please feel free to contact us at `wbtan@stu.xmu.edu.cn`. Discussions are welcome.
 **Paper Framework**
 
-![Paper Framework](./img/fig_overall_network.pdf)
+![Paper Framework](./img/fig_overall_network.png)
 
 ## 0. Installation
 
