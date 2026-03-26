@@ -1,19 +1,16 @@
-<<<<<<< HEAD
-# PC-CrossDiff
- **中文:** 感谢您关注本项目！本项目的相关会议论文目前正处于期刊扩展与审稿阶段。为了符合审稿政策及出版要求，完整的源代码及相关数据将于 **2026年4月20日** 之前正式开源上传。敬请期待！
-
- **English:** Thank you for your interest in our work! The conference paper associated with this repository is currently being extended into a journal version. To comply with review policies and publication requirements, the complete source code and datasets will be uploaded and released before **April 20, 2026**. Stay tuned!
-=======
 # PC_CrossDiff
 
 ## News
 
-- **2026-03-23**: Official code release of **PC_CrossDiff**.
+- **2026-03-26**: Official code release of **PC_CrossDiff**.
 - **AAAI 2026**: Our paper **"PC-CrossDiff: Point-Cluster Dual-Level Cross-Modal Differential Attention for Unified 3D Referring and Segmentation"** is accepted by **Proceedings of the AAAI Conference on Artificial Intelligence**.
 
 :tada::tada::tada:
 This repository provides the PyTorch implementation of **PC_CrossDiff**, proposed in the paper ["PC-CrossDiff: Point-Cluster Dual-Level Cross-Modal Differential Attention for Unified 3D Referring and Segmentation"] (AAAI 2026).
-![image](https://github.com/qzp2018/PC_CrossDiff/blob/main/data/fig.png)
+If you are interested in our work and have any questions, please feel free to contact us at `wbtan@stu.xmu.edu.cn`. Discussions are welcome.
+**Paper Framework**
+
+![Paper Framework](./img/fig_overall_network.pdf)
 
 ## 0. Installation
 
@@ -70,7 +67,7 @@ PY
 
 + **(5)** Install segmentator from https://github.com/Karbo123/segmentator
 
-## 0.1 Environment/runtime fixes (2026-03-05)
+## 0.1 Environment/runtime fixes 
 
 - In `PC_CrossDiff`, it is recommended to pin `setuptools==65.6.3` and `packaging>=23,<25` to avoid the `pkg_resources.packaging` import error in `torch==1.12`.
 - `KNN_CUDA` and `pointnet2` should both be installed and verified with CUDA enabled.
@@ -82,14 +79,7 @@ We provide visualization through `wandb` for superpoints, keypoints, bad-case an
 ```python
 self.visualization_superpoint = False
 ```
-+ others in `src/grounding_evaluator.py` lines 67-71
-```python
-self.visualization_pred = False
-self.visualization_gt = False
-self.bad_case_visualization = False
-self.kps_points_visualization = False
-self.bad_case_threshold = 0.15
-```
+
 
 ## 2. Data preparation
 
@@ -170,15 +160,23 @@ ScanNetv2
 
 ## 3. Models
 
-| Dataset/Model | RES mAP@0.25 | RES mAP@0.5 | RES mIoU | Model |
-|:---:|:------------:|:-----------:|:--------:|:---:|
-| ScanRefer/PC_CrossDiff |    60.41     |    52.52    |  46.39   | [GoogleDrive]() |
+|         Dataset/Model         | RES mAP@0.25 | RES mAP@0.5 | RES mIoU | Model |
+|:-----------------------------:|:------------:|:-----------:|:--------:|:---:|
+|    ScanRefer/PC_CrossDiff     |    60.41     |    52.52    |  46.39   |  |
+| ScanRefer/PC_CrossDiff (best) |    61.45     |    54.44    |  47.63   | [GoogleDrive](https://drive.google.com/file/d/1CPA1qzyiwdDPA-ma9T2ill6iijutSWqF/view?usp=sharing) |
+
+
+
+|   Dataset/Model   | easy mAP@0.25 | hard mAP@0.25 | vd mAP@0.25 | vid mAP@0.25 | overall mAP@0.25 | Model |
+|:-----------------:|:-------------:|:-------------:|:------------:|:-------------:|:-----------------:|:-----:|
+| Nr3D/PC_CrossDiff |     62.22     |     57.52     |    60.55     |    59.60     |      59.91        | [GoogleDrive](https://drive.google.com/file/d/1QuYU6CpcnpTD8G1kVsU0au2nxwrzf5Mo/view?usp=sharing) |
+
 
 ## 4. Training
 
 + Please specify the paths of `--data_root`, `--log_dir`, `--pp_checkpoint` in the `train_*.sh` script first.
 + Logs are saved under `.../all_logs/PC_CrossDiff/<dataset>/<timestamp>/`, for example `.../all_logs/PC_CrossDiff/scanrefer/<timestamp>/`.
-+ Before training and evaluation, it is recommended to save pre-processed language features in `src/joint_det_dataset.py` lines 135-140, which can save a lot of time.
++ 
 + For **ScanRefer** training
   ```bash
   sh scripts/train_scanrefer_PC_CrossDiff_sp.sh
@@ -243,4 +241,3 @@ If you find our work useful in your research, please consider citing:
   langid = {english},
 }
 ```
->>>>>>> init project

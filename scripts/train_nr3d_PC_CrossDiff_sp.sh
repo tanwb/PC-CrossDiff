@@ -16,14 +16,14 @@ kill_existing_training() {
 kill_existing_training
 
 
-LOG_ROOT=/trxydsjtwb/data/model/vg3d/all_logs
+LOG_ROOT=/twb/data/model/vg3d/all_logs
 
 TORCH_DISTRIBUTED_DEBUG=INFO CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 python -m torch.distributed.launch \
     --nproc_per_node 8 --master_port 4444 \
     train_dist_mod.py --num_decoder_layers 6 \
     --use_color \
     --weight_decay 0.0005 \
-    --data_root /trxydsjtwb/data/data_set/3DVG_Data \
+    --data_root /twb/data/data_set/3DVG_Data \
     --val_freq 1 --batch_size 6 --save_freq 1 --print_freq 500 \
     --lr_backbone=2e-3 --lr=2e-4 \
     --dataset nr3d --test_dataset nr3d \
@@ -31,8 +31,8 @@ TORCH_DISTRIBUTED_DEBUG=INFO CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 python -m torc
     --use_soft_token_loss --use_contrastive_align \
     --log_dir "${LOG_ROOT}/" \
     --lr_decay_epochs 50 75 \
-    --pp_checkpoint /trxydsjtwb/data/data_set/3DVG_Data/gf_detector_l6o256.pth \
-    --checkpoint_path /trxydsjtwb/data/model/pt_epoch_last.pth \
+    --pp_checkpoint /twb/data/data_set/3DVG_Data/gf_detector_l6o256.pth \
+    --checkpoint_path /twb/data/model/pt_epoch_last.pth \
     --butd --self_attend --augment_det \
     --max_epoch 100 \
     --dgt_start_epoch 30 --dgt_stop_epoch 45 \

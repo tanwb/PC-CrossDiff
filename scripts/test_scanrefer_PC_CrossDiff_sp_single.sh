@@ -16,14 +16,14 @@ kill_existing_training() {
 kill_existing_training
 
 
-LOG_ROOT=/trxydsjtwb/data/model/vg3d/all_logs
+LOG_ROOT=/twb/data/model/vg3d/all_logs
 
 TORCH_DISTRIBUTED_DEBUG=INFO CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 python -m torch.distributed.launch \
     --nproc_per_node 8 --master_port 1111 \
     train_dist_mod.py --num_decoder_layers 6 \
     --use_color \
     --weight_decay 0.0005 \
-    --data_root /trxydsjtwb/data/data_set/3DVG_Data \
+    --data_root /twb/data/data_set/3DVG_Data \
     --val_freq 3 --batch_size 8 --save_freq 3 --print_freq 500 \
     --lr_backbone=2e-3 --lr=2e-4 \
     --dataset scanrefer --test_dataset scanrefer \
@@ -32,7 +32,7 @@ TORCH_DISTRIBUTED_DEBUG=INFO CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 python -m torc
     --log_dir "${LOG_ROOT}/" \
     --lr_decay_epochs 50 75 \
     --self_attend --augment_det \
-    --checkpoint_path /trxydsjtwb/data/model/vg3d/all_logs/PC_CrossDiff/scanrefer/XXX/ckpt_epoch_1.pth \
+    --checkpoint_path /twb/data/model/vg3d/all_logs/PC_CrossDiff/scanrefer/XXX/ckpt_epoch_best.pth \
     --model PC_CrossDiff \
     --small_lr \
     --exp "PC_CrossDiff" \

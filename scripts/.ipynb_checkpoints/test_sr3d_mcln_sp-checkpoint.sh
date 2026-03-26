@@ -12,7 +12,7 @@ TORCH_DISTRIBUTED_DEBUG=INFO CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 python -m torc
     --log_dir /dsjxytest/can_not_remove/model/vg3d/all_logs/ \
     --lr_decay_epochs 150 \
     --butd_cls --self_attend \
-    --checkpoint_path /trxydsjtwb/twb/model/vg3d/MCLN-main/output/checkpoints0/ckpt_epoch_54.pth \
+    --checkpoint_path /twb/twb/model/vg3d/MCLN-main/output/checkpoints0/ckpt_epoch_54.pth \
     --eval \
     --model MCLN \
     --exp MCLN \
