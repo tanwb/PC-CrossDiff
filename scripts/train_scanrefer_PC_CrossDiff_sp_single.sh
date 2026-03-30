@@ -32,7 +32,7 @@ TORCH_DISTRIBUTED_DEBUG=INFO CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 python -m torc
     --log_dir "${LOG_ROOT}/" \
     --lr_decay_epochs 50 75 \
     --self_attend --augment_det \
-    --max_epoch 100 \
+    --max_epoch 150 \
     --dgt_start_epoch 30 --dgt_stop_epoch 45 \
     --dgt_ratio_diff_threshold 0.008 \
     --dgt_clamp_min 0.995 --dgt_clamp_max 1.005 --dgt_main_max_step 0.0010 \
