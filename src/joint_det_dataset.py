@@ -28,6 +28,7 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 from transformers import RobertaTokenizerFast
+from tqdm.auto import tqdm
 # import wandb
 
 import copy
@@ -55,6 +56,16 @@ logger = logging.getLogger("TextParser")
 logger.setLevel(logging.INFO)
 
 _sng_parser_lock = threading.Lock()
+
+
+def _is_rank0():
+    try:
+        import torch.distributed as dist
+        if dist.is_initialized():
+            return dist.get_rank() == 0
+    except Exception:
+        pass
+    return True
 
 
 class Joint3DDataset(Dataset):
@@ -129,7 +140,8 @@ class Joint3DDataset(Dataset):
             with open('data/cls_results.json') as fid:
                 self.cls_results = json.load(fid)
 
-        print('Loading %s files, take a breath!' % split)
+        if _is_rank0():
+            print('Loading %s files, take a breath!' % split)
 
         # step 3. generate or load train/val_v3scans.pkl
         if not os.path.exists(f'{self.data_path}/{split}_v3scans.pkl'):
@@ -1583,9 +1595,27 @@ def Scene_graph_parse(annos, cache_tag=None, skip_if_test=False, split='train', 
         except Exception as e:
             logger.error(f"Failed to load cache: {str(e)}, reparsing")
 
-    logger.info(f"[Scene_graph_parse] Cache missing or invalid; parsing {len(annos)} entries")
+    cache_label = cache_tag or f"parse_{split}"
+    parts = cache_label.split('_')
+    dataset_label = parts[0] if parts else 'text'
+    progress_desc = f"Parsing {dataset_label}/{split}"
+
+    logger.info(f"[Scene_graph_parse] Parsing {len(annos)} entries for {dataset_label}/{split}")
     parsed_results = []
-    for anno in annos:
+
+    show_progress = _is_rank0()
+
+    progress = tqdm(
+        annos,
+        total=len(annos),
+        desc=progress_desc,
+        unit="it",
+        dynamic_ncols=True,
+        mininterval=1.0,
+        leave=True,
+        disable=not show_progress,
+    )
+    for anno in progress:
         caption = _preprocess_caption(anno.get('utterance', ''), anno.get('dataset', ''))
 
         anno['utterance'] = caption
@@ -1624,6 +1654,8 @@ def Scene_graph_parse(annos, cache_tag=None, skip_if_test=False, split='train', 
             'modified_entity': anno['modified_entity']
         })
 
+    if show_progress:
+        progress.close()
     logger.info(f"[Scene_graph_parse] Parsing complete: {len(annos)} entries")
 
     if cache_path:
