@@ -25,7 +25,7 @@ TORCH_DISTRIBUTED_DEBUG=INFO CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 python -m torc
     --use_color \
     --weight_decay 0.0005 \
     --data_root /twb/data/data_set/3DVG_Data \
-    --val_freq 1 --batch_size 8 --save_freq 1 --print_freq 500 \
+    --val_freq 1 --batch_size 4 --save_freq 1 --print_freq 500 \
     --lr_backbone=1e-3 --lr=1e-4 \
     --dataset sr3d --test_dataset sr3d \
     --detect_intermediate --joint_det \
